@@ -149,6 +149,7 @@ node = Node(strtNode, 0, None)
 nodeObj[str(node.position)] = node
 que.put([node.cost, node.position])
 
+iter = 0
 while not que.empty():
     queNode = que.get()
     node = nodeObj[str(queNode[1])]
@@ -167,11 +168,31 @@ while not que.empty():
         else:
             visSet.add(str(neighNode))
             canvas[(249 - neighNode[1]), neighNode[0], :] = np.array([0, 255, 0])
+
+            if iter%1000 == 0:
+                cv.imshow("Dijkstra Algorithm", canvas)
+                cv.waitKey(1)
+
             updCost = neighCost + cstCome[str(node.position)]
-            cv.imshow("Dijkstra Algorithm", canvas)
-            cv.waitKey(1)
             cstCome[str(neighNode)] = updCost
             nxtNode = Node(neighNode, updCost, nodeObj[str(node.position)])
             que.put([updCost, nxtNode.position])
             nodeObj[str(nxtNode.position)] = nxtNode
+    iter += 1
 
+bckTrackNode = nodeObj[str(goalNode)]
+prntNode = bckTrackNode.parent
+bckTrackLst = []
+
+while prntNode:
+    bckTrackLst.append([(249 - prntNode.position[1]), prntNode.position[0]])
+    prntNode = prntNode.parent
+
+# bckTrackLst = sorted(bckTrackLst, key=lambda x: x[1])
+bckTrackLst.reverse()
+
+for val in bckTrackLst:
+    canvas[val[0], val[1], :] = np.array([255, 0, 0])
+    cv.imshow("Dijkstra Algorithm", canvas)
+    cv.waitKey(1)
+    
