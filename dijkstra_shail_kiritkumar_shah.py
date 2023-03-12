@@ -154,42 +154,56 @@ def eigConNeigh(node):
     nxtNeigh = feasAppd(conNeighList)
     return nxtNeigh
 
+# main code stub for node object initialization and backtracking
 global canvas
 que = PriorityQueue()
 visSet = set([])
 nodeObj = {}
+# Generating map
 canvas = genMap()
 videoStr = []
+# Checking user input if it is on border or inside any obstacle
 status = False
 while not status:
     strtNode = [int(ele) for ele in input("Enter starting coordinates: ").split(" ")]
     goalNode = [int(ele) for ele in input("Enter goal coordinates: ").split(" ")]
     status = chckCoor(strtNode, goalNode)
 
+# Starting time for calculation algorithm time
 start_t = tm.time()
 
+# Initializing cost to come as infinite initially for all coordinates
 cstCome = {}
 for i in range(250):
     for j in range(600):
         cstCome[str([i, j])] = m.inf
 
+# Cost to come for initial node to be zero
 cstCome[str(strtNode)] = 0
+# Adding first node to visited set
 visSet.add(str(strtNode))
 node = Node(strtNode, 0, None)
 nodeObj[str(node.position)] = node
+# Using Queue for putting cost and position as it will help in getting
+# node with least cost first by default
 que.put([node.cost, node.position])
 
 iter = 0
+# Running the loop until the queue is empty
 while not que.empty():
+    # Fetching node with least cost
     queNode = que.get()
     node = nodeObj[str(queNode[1])]
     if queNode[1][0] == goalNode[0] and queNode[1][1] == goalNode[1]:
         nodeObj[str(goalNode)] = Node(goalNode, queNode[0], node)
         break
     
+    # Finding neighbors
     for neighNode, neighCost in eigConNeigh(node):
 
+        # Checking if the neighbor is already in visited set
         if str(neighNode) in visSet:
+            # If yes then updating only if less than cost to come
             neighUpdCost = neighCost + cstCome[str(node.position)]
             if neighUpdCost<cstCome[str(neighNode)]:
                 cstCome[str(neighNode)] = neighUpdCost
@@ -211,6 +225,7 @@ while not que.empty():
             nodeObj[str(nxtNode.position)] = nxtNode
     iter += 1
 
+# Backtracking algorithm
 bckTrackNode = nodeObj[str(goalNode)]
 prntNode = bckTrackNode.parent
 bckTrackLst = []
@@ -232,6 +247,7 @@ end_t = tm.time()
 
 print("Total time taken to find the optimal path: {:.2f}".format(end_t - start_t), " seconds")
 
+# Video writing stub
 clip = cv.VideoWriter(
     'dijkstra.mp4', cv.VideoWriter_fourcc(*'MP4V'), 25, (600, 250))
 
