@@ -9,6 +9,8 @@ Task    : Project-2
 # Importing all necessary modules/libraries for computation
 import numpy as np
 import cv2 as cv
+from queue import PriorityQueue
+import math as m
 
 # Drawing polyline shapes
 def polyShap(img, polyPts, color, type):
@@ -48,9 +50,6 @@ def genMap():
     polyShap(arena, triPts, red, "Obstacle")
     triBorPts = np.array([[456, 20], [456, 230], [514,125]], np.int32)
     polyShap(arena, triBorPts, white, "Border")
-
-    cv.imshow("Preview", arena)
-    cv.waitKey(0)
 
     return arena
 
@@ -132,10 +131,47 @@ def eigConNeigh(node):
     return nxtNeigh
 
 global canvas
-
+que = PriorityQueue()
+visSet = set([])
+nodeObj = {}
 canvas = genMap()
+strtNode = [6,6]
+goalNode = [500,200]
 
-node = Node([10, 10], 0, None)
-result = eigConNeigh(node)
+cstCome = {}
+for i in range(250):
+    for j in range(600):
+        cstCome[str([i, j])] = m.inf
 
-print(result)
+cstCome[str(strtNode)] = 0
+visSet.add(str(strtNode))
+node = Node(strtNode, 0, None)
+nodeObj[str(node.position)] = node
+que.put([node.cost, node.position])
+
+while not que.empty():
+    queNode = que.get()
+    node = nodeObj[str(queNode[1])]
+    if queNode[1][0] == goalNode[0] and queNode[1][1] == goalNode[1]:
+        nodeObj[str(goalNode)] = Node(goalNode, queNode[0], node)
+        break
+    
+    for neighNode, neighCost in eigConNeigh(node):
+
+        if str(neighNode) in visSet:
+            neighUpdCost = neighCost + cstCome[str(node.position)]
+            if neighUpdCost<cstCome[str(neighNode)]:
+                cstCome[str(neighNode)] = neighUpdCost
+                nodeObj[str(neighNode)].parent = node
+            
+        else:
+            visSet.add(str(neighNode))
+            canvas[(249 - neighNode[1]), neighNode[0], :] = np.array([0, 255, 0])
+            updCost = neighCost + cstCome[str(node.position)]
+            cv.imshow("Dijkstra Algorithm", canvas)
+            cv.waitKey(1)
+            cstCome[str(neighNode)] = updCost
+            nxtNode = Node(neighNode, updCost, nodeObj[str(node.position)])
+            que.put([updCost, nxtNode.position])
+            nodeObj[str(nxtNode.position)] = nxtNode
+
