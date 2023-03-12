@@ -11,6 +11,7 @@ import numpy as np
 import cv2 as cv
 from queue import PriorityQueue
 import math as m
+import time as tm
 
 # Drawing polyline shapes
 def polyShap(img, polyPts, color, type):
@@ -135,8 +136,10 @@ que = PriorityQueue()
 visSet = set([])
 nodeObj = {}
 canvas = genMap()
-strtNode = [6,6]
-goalNode = [500,200]
+strtNode = [int(ele) for ele in input("Enter starting coordinates: ").split(" ")]
+goalNode = [int(ele) for ele in input("Enter goal coordinates: ").split(" ")]
+
+start_t = tm.time()
 
 cstCome = {}
 for i in range(250):
@@ -195,4 +198,7 @@ for val in bckTrackLst:
     canvas[val[0], val[1], :] = np.array([255, 0, 0])
     cv.imshow("Dijkstra Algorithm", canvas)
     cv.waitKey(1)
-    
+
+end_t = tm.time()
+
+print("Total time taken to find the optimal path: {:.2f}".format(end_t - start_t), " seconds")
