@@ -41,11 +41,11 @@ def genMap():
     cv.rectangle(arena, (-1, -1), (599, 249), white, 10)
 
     # Drawing all polygon shaped obstacles
-    hexPts = np.array([[235, 87.5], [235, 162.5], [300,200], 
-                       [365,162.5], [365, 87.5], [300,50]], np.int32)
+    hexPts = np.array([[300,50], [365, 87.5], [365,162.5], 
+                       [300,200], [235, 162.5], [235, 87.5]], np.int32)
     polyShap(arena, hexPts, orange, "Obstacle")
-    hexBorPts = np.array([[235, 87.5], [235, 162.5], [300,205], 
-                          [369,162.5], [369, 87.5], [300,45]], np.int32)
+    hexBorPts = np.array([[300,45], [369, 87.5], [369,162.5], 
+                          [300,205], [235, 162.5], [235, 87.5]], np.int32)
     polyShap(arena, hexBorPts, white, "Border")
     triPts = np.array([[460, 25], [460, 225], [510,125]], np.int32)
     polyShap(arena, triPts, red, "Obstacle")
@@ -158,6 +158,7 @@ que = PriorityQueue()
 visSet = set([])
 nodeObj = {}
 canvas = genMap()
+videoStr = []
 status = False
 while not status:
     strtNode = [int(ele) for ele in input("Enter starting coordinates: ").split(" ")]
@@ -198,6 +199,7 @@ while not que.empty():
             canvas[(249 - neighNode[1]), neighNode[0], :] = np.array([0, 255, 0])
 
             if iter%1000 == 0:
+                videoStr.append(canvas.copy())
                 cv.imshow("Dijkstra Algorithm", canvas)
                 cv.waitKey(1)
 
@@ -221,9 +223,20 @@ bckTrackLst.reverse()
 
 for val in bckTrackLst:
     canvas[val[0], val[1], :] = np.array([255, 0, 0])
+    videoStr.append(canvas.copy())
     cv.imshow("Dijkstra Algorithm", canvas)
     cv.waitKey(1)
 
 end_t = tm.time()
 
 print("Total time taken to find the optimal path: {:.2f}".format(end_t - start_t), " seconds")
+
+clip = cv.VideoWriter(
+    'dijkstra.mp4', cv.VideoWriter_fourcc(*'MP4V'), 25, (600, 250))
+
+for idx in range(len(videoStr)):
+    frame = videoStr[idx]
+    clip.write(frame)
+clip.release()
+
+print("Clip stored at terminal's directory path")
