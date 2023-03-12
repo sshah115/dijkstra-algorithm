@@ -54,4 +54,88 @@ def genMap():
 
     return arena
 
-arena = genMap()
+# Defining node class to allot coordinate, cost and parent to-
+# node object for ease of computation and efficient backtracking
+class Node:
+    def __init__(self,position,cost,parent):
+        self.position = position
+        self.cost = cost
+        self.parent = parent
+
+# Functions to compute eight connected neighbours using different functions-
+# as specified in project guideline
+
+# Function to move up
+def movUp(curPos):
+    curPos[1] += 1
+    return curPos, 1
+
+# Function to move down
+def movDow(curPos):
+    curPos[1] -= 1
+    return curPos, 1
+
+# Function to move right
+def movRig(curPos):
+    curPos[0] += 1
+    return curPos, 1
+
+# Function to move left
+def movLef(curPos):
+    curPos[0] -= 1
+    return curPos, 1
+
+# Function to move up-right
+def movUpRig(curPos):
+    curPos[0] += 1
+    curPos[1] += 1
+    return curPos, 1.4
+
+# Function to move up-left
+def movUpLef(curPos):
+    curPos[0] -= 1
+    curPos[1] += 1
+    return curPos, 1.4
+
+# Function to move down-right
+def movDowRig(curPos):
+    curPos[0] += 1
+    curPos[1] -= 1
+    return curPos, 1.4
+
+# Function to move down-left
+def movDowLef(curPos):
+    curPos[0] -= 1
+    curPos[1] -= 1
+    return curPos, 1.4
+
+# Function to check feasibility of computed neighbors in terms of its location-
+# and subsequently appenging it to a list only if the coordinate's value is zero-
+# which is possible exploration space
+def feasAppd(curPos):
+    nxtNeigh = []
+    for ele in curPos:
+        if ele[0][1]>=0 and ele[0][1]<250 and ele[0][0]>=0 and ele[0][0]<600:
+            if canvas[(249 - ele[0][1]), ele[0][0]].all() == np.array([0, 0, 0]).all():
+                nxtNeigh.append([ele[0], ele[1]])
+    return nxtNeigh
+
+# Function to accept node coordinate and generate next neighbor list for each node
+def eigConNeigh(node):
+    curPos = [node.position[0], node.position[1]]
+    conNeighList = [movUp(curPos.copy()), movDow(curPos.copy()),
+                    movRig(curPos.copy()), movLef(curPos.copy()),
+                    movUpRig(curPos.copy()), movDowRig(curPos.copy()),
+                    movUpLef(curPos.copy()), movDowLef(curPos.copy())]
+    
+    nxtNeigh = feasAppd(conNeighList)
+    return nxtNeigh
+
+global canvas
+
+canvas = genMap()
+
+node = Node([10, 10], 0, None)
+result = eigConNeigh(node)
+
+print(result)
