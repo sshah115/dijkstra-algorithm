@@ -54,6 +54,28 @@ def genMap():
 
     return arena
 
+# Checking coordinates if it lies in obstacle space
+def chckCoor(startPt, endPt):
+    # This function will check if the points are okay, on border or
+    # inside obstacle
+    if canvas[(249 -startPt[1]), startPt[0]].any() == np.array([0, 0, 0]).all():
+        if canvas[(249 - endPt[1]), endPt[0]].any() == np.array([0, 0, 0]).all():
+            print("Processing!!!")
+            status = True
+        elif canvas[(249 - endPt[1]), endPt[0]].all() == np.array([255, 255, 255]).all():
+            print("The goal coordinate is on border")
+            status = False
+        else:
+            print("The goal coordinate is inside obstacle")
+            status = False 
+    elif canvas[(249 -startPt[1]), startPt[0]].all() == np.array([255, 255, 255]).all():
+        print("The start coordinate is on border")
+        status = False
+    else:
+        print("The start coordinate is inside obstacle")
+        status = False 
+    return status
+
 # Defining node class to allot coordinate, cost and parent to-
 # node object for ease of computation and efficient backtracking
 class Node:
@@ -136,8 +158,11 @@ que = PriorityQueue()
 visSet = set([])
 nodeObj = {}
 canvas = genMap()
-strtNode = [int(ele) for ele in input("Enter starting coordinates: ").split(" ")]
-goalNode = [int(ele) for ele in input("Enter goal coordinates: ").split(" ")]
+status = False
+while not status:
+    strtNode = [int(ele) for ele in input("Enter starting coordinates: ").split(" ")]
+    goalNode = [int(ele) for ele in input("Enter goal coordinates: ").split(" ")]
+    status = chckCoor(strtNode, goalNode)
 
 start_t = tm.time()
 
